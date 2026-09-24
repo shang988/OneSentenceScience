@@ -25,11 +25,19 @@ This is a working **v0.1 source-available prototype**. Its answers are prelimina
 
 ### Quick start
 
-You need Python 3.11+, an internet connection, and a language-model service compatible with `/v1/chat/completions`. It can run locally or be a service you configure. The project has no third-party Python dependencies.
+You need Python 3.11+ and an internet connection for OpenAlex. The project has no third-party Python dependencies. Start the local app:
+
+```powershell
+python -m onesentencescience
+```
+
+Open `http://127.0.0.1:8765`. Select **OpenAI API**, enter your API key on the page, and start with a sentence. The default model is `gpt-4.1-mini`; you can change its name in “Interface and model settings.” An OpenAI API key with access to that model is required. You can also select **Custom compatible endpoint** for a `/v1/chat/completions` service, or **Local environment variables** for the previous setup method.
+
+To keep chats on your computer, click **Choose chat folder** and select a folder. Each conversation becomes a JSON file there. Select the same folder next time, pick a conversation, and ask a follow-up; earlier turns help interpret the new question, while evidence is searched again. A browser with `showDirectoryPicker()` support uses its folder picker; otherwise, the local Python app opens a system folder dialog. If a dialog is unavailable, you can still import and download JSON files. The app never stores your API key in those files.
 
 #### Local Ollama example
 
-Install and start Ollama, then choose a model that understands both English and Chinese. For example:
+Install and start Ollama, then choose a model that understands both English and Chinese. On the page select **Custom compatible endpoint**; it pre-fills the local URL and model below, and the key can stay blank. You can also use environment variables:
 
 ```powershell
 ollama pull qwen2.5:7b
@@ -38,9 +46,9 @@ $env:LLM_MODEL = "qwen2.5:7b"
 python -m onesentencescience
 ```
 
-Open `http://127.0.0.1:8765`.
-
 #### Other compatible services
+
+Use the page's custom endpoint fields, or keep using environment variables:
 
 ```powershell
 $env:LLM_BASE_URL = "https://your-service.example/v1"
@@ -53,7 +61,7 @@ You may also set `OPENALEX_API_KEY` to use your own OpenAlex allowance. Keep key
 
 ### What v0.1 does
 
-The web page has one main input. The backend turns a sentence into a research question and English search terms, queries OpenAlex, and asks the model to answer using only the abstracts actually retrieved. Every evidence claim must point to a paper from that search; the app discards invented citations. The report keeps the question, search terms, and paper links so people can check them.
+The web page has one main observation input plus model and local history controls. The backend turns a sentence into a research question and English search terms, queries OpenAlex, and asks the model to answer using only the abstracts actually retrieved. Every evidence claim must point to a paper from that search; the app discards invented citations. The report keeps the question, search terms, and paper links so people can check them. A follow-up uses up to six earlier turns as conversational context, not as scientific evidence.
 
 “Initial support” does not establish causation or mean the result applies to everyone. When the search is incomplete, abstracts lack detail, or studies disagree, the answer should say “insufficient evidence” or “mixed findings.”
 
@@ -68,7 +76,7 @@ Publishing papers and user incentives are outside this first version. The long-t
 
 ### Privacy and boundaries
 
-Your original sentence is sent to the language-model service you configure. Generated English search terms are sent to OpenAlex. By default, the app listens only on `127.0.0.1`; it does not save conversations or create accounts. Avoid entering other people's names, contact details, or sensitive information.
+Your sentence and API key are sent from the page to the local server, which forwards them to the model service you chose. Generated English search terms are sent to OpenAlex. The app listens only on `127.0.0.1` and creates no account. A key entered on the page is not persisted by the app; conversations are written only to a folder you select, or downloaded when you choose to download them. Without a folder, chats last only until the page closes. Avoid entering other people's names, contact details, or sensitive information.
 
 This version does not recruit research participants, deliver psychological interventions, or provide personal medical or legal judgments. A genuinely new question may need new data and a suitable study design; the app should say so.
 
@@ -109,11 +117,19 @@ Earlier commits were published under MIT. The new license applies to this revisi
 
 ### 快速开始
 
-需要 Python 3.11+、网络连接，以及一个兼容 `/v1/chat/completions` 的语言模型服务。服务可以在本机运行，也可以由你自行配置。项目本身没有第三方 Python 依赖。
+需要 Python 3.11+ 和用于检索 OpenAlex 的网络连接。项目本身没有第三方 Python 依赖。先启动本地程序：
+
+```powershell
+python -m onesentencescience
+```
+
+打开 `http://127.0.0.1:8765`，选择 **OpenAI API**，直接在网页输入 API 密钥，再写下一句观察即可开始。默认模型为 `gpt-4.1-mini`，可在“接口与模型设置”中修改模型名称；所填密钥需要有该模型的访问权限。你也可以选择**自定义兼容接口**，或继续使用**本机环境变量**。
+
+若要把聊天记录留在自己的电脑上，点击**选择聊天文件夹**并选择一个目录。每段聊天会保存为一个 JSON 文件。下次重新选择同一文件夹，点开旧记录就能继续追问；旧对话帮助理解追问，新答案仍会重新检索证据。支持 `showDirectoryPicker()` 的浏览器会使用浏览器文件夹选择器；其他浏览器会由本地 Python 程序打开系统文件夹窗口。若系统窗口不可用，仍可导入和下载 JSON 文件。密钥绝不会写进聊天文件。
 
 #### 使用本机 Ollama（示例）
 
-先安装并启动 Ollama，准备一个支持中英文的模型。下面以 `qwen2.5:7b` 为例；模型下载和运行由 Ollama 完成。
+先安装并启动 Ollama，准备一个支持中英文的模型。网页选择**自定义兼容接口**后，会预填下面的本机地址和模型名称，密钥可以留空。也可以继续用环境变量：
 
 ```powershell
 ollama pull qwen2.5:7b
@@ -122,9 +138,9 @@ $env:LLM_MODEL = "qwen2.5:7b"
 python -m onesentencescience
 ```
 
-打开 `http://127.0.0.1:8765`。
-
 #### 使用其他兼容服务
+
+可直接在网页填写兼容接口，也可继续使用环境变量：
 
 ```powershell
 $env:LLM_BASE_URL = "https://你的服务地址/v1"
@@ -137,7 +153,7 @@ python -m onesentencescience
 
 ### 第一个版本能做什么
 
-网页只有一个主要输入框。输入一句话后，后端会将它转成研究问题和英文检索词，查询 OpenAlex，再让模型只依据实际返回的论文摘要作答。每条证据必须引用本次检索得到的论文；不存在的引用会被程序丢弃。最终报告会保留原始问题、检索词和论文链接，方便人检查。
+网页有一个主要的观察输入框，以及模型设置和本地记录入口。输入一句话后，后端会将它转成研究问题和英文检索词，查询 OpenAlex，再让模型只依据实际返回的论文摘要作答。每条证据必须引用本次检索得到的论文；不存在的引用会被程序丢弃。最终报告会保留原始问题、检索词和论文链接，方便人检查。追问最多参考前六轮对话来理解上下文，不会把旧回答当作科学证据。
 
 结果中的“有初步支持”不表示因果关系已经被证明，也不表示对每个人都适用。文献检索不完整、摘要信息不足或研究间存在差异时，系统应输出“证据不足”或“结果不一致”。
 
@@ -152,7 +168,7 @@ python -m onesentencescience
 
 ### 隐私与边界
 
-输入的原句会发送到你配置的语言模型服务；生成的英文检索词会发送给 OpenAlex。应用默认只监听本机 `127.0.0.1`，不保存对话或建立账号。不要在输入中写入他人的姓名、联系方式或其他敏感信息。
+输入的原句和密钥会先发送给本机服务，再由本机服务转发给你选定的模型服务；生成的英文检索词会发送给 OpenAlex。应用只监听本机 `127.0.0.1`，不建立账号，也不会持久保存你在页面输入的密钥。聊天记录只会写入你选择的文件夹，或在你主动下载时导出；未选择文件夹时，关闭页面后记录会消失。不要在输入中写入他人的姓名、联系方式或其他敏感信息。
 
 当前版本不招募研究参与者、不开展心理干预，也不提供个人医疗或法律判断。想研究一个尚无资料回答的新问题，需要真实数据和相应的研究方法；系统会承认这个界限。
 

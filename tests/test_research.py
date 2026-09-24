@@ -1,8 +1,11 @@
 import unittest
+from unittest.mock import patch
 
 from onesentencescience.research import (
     ResearchError,
     analyze,
+    call_model,
+    model_settings,
     reconstruct_abstract,
     search_papers,
 )
@@ -30,10 +33,12 @@ class FakeModel:
     def __init__(self, invented_citation=False):
         self.calls = 0
         self.invented_citation = invented_citation
+        self.first_messages = None
 
     def __call__(self, messages, max_tokens=1200):
         self.calls += 1
         if self.calls == 1:
+            self.first_messages = messages
             return {
                 "phenomenon": "和朋友散步时似乎更容易谈起心事。",
                 "research_question": "散步与谈话中的自我表达是否有关？",
@@ -90,6 +95,40 @@ class ResearchTests(unittest.TestCase):
         with self.assertRaises(ResearchError) as error:
             analyze("有点怪", model=FakeModel(), search=lambda queries: [])
         self.assertEqual(error.exception.status, 400)
+
+    def test_page_model_settings_reject_remote_plain_http(self):
+        config = {"base_url": "https://api.openai.com/v1",
+                  "model": "gpt-4.1-mini", "api_key": "test-key"}
+        self.assertEqual(model_settings(config),
+                         ("https://api.openai.com/v1", "gpt-4.1-mini", "test-key"))
+        config["base_url"] = "http://example.com/v1"
+        with self.assertRaises(ResearchError) as error:
+            model_settings(config)
+        self.assertEqual(error.exception.status, 400)
+
+    def test_page_key_is_used_for_one_model_request(self):
+        config = {"base_url": "https://api.openai.com/v1",
+                  "model": "gpt-4.1-mini", "api_key": "test-key"}
+        with patch("onesentencescience.research.fetch_json", return_value={
+            "choices": [{"message": {"content": '{"ok": true}'}}]
+        }) as fetcher:
+            self.assertEqual(call_model([{"role": "user", "content": "test"}], config=config),
+                             {"ok": True})
+        self.assertEqual(fetcher.call_args.kwargs["headers"]["Authorization"],
+                         "Bearer test-key")
+        self.assertEqual(fetcher.call_args.args[0],
+                         "https://api.openai.com/v1/chat/completions")
+
+    def test_followup_uses_previous_turn_only_as_context(self):
+        model = FakeModel()
+        paper = search_papers(["walking conversational self disclosure"],
+                              fetcher=lambda url, timeout=25: {"results": [PAPER]})[0]
+        analyze("为什么？", model=model, search=lambda queries: [paper],
+                history=[{"observation": "和朋友散步更容易谈心。",
+                          "research_question": "散步与自我表达是否有关？",
+                          "conclusion": "只有初步线索。"}])
+        self.assertIn("和朋友散步更容易谈心。", model.first_messages[1]["content"])
+        self.assertIn("为什么？", model.first_messages[1]["content"])
 
 
 if __name__ == "__main__":
