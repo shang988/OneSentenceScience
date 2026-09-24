@@ -10,18 +10,18 @@ from onesentencescience.research import (
 
 PAPER = {
     "id": "https://openalex.org/W123456789",
-    "title": "Overtime and workplace helping behavior",
+    "title": "Walking and conversational self-disclosure",
     "publication_year": 2022,
     "doi": "https://doi.org/10.1234/example",
     "abstract_inverted_index": {
-        "Overtime": [0], "was": [1], "associated": [2], "with": [3],
-        "lower": [4], "helping": [5], "behavior": [6], "in": [7],
-        "one": [8], "workplace": [9], "sample": [10], ".": [11],
-        "The": [12], "study": [13], "did": [14], "not": [15],
-        "establish": [16], "a": [17], "causal": [18], "effect": [19],
-        "and": [20], "further": [21], "research": [22], "is": [23],
-        "needed": [24], "before": [25], "generalizing": [26], "the": [27],
-        "finding": [28], "to": [29], "other": [30], "contexts": [31],
+        "Walking": [0], "was": [1], "associated": [2], "with": [3],
+        "greater": [4], "self-disclosure": [5], "during": [6], "conversation": [7],
+        "in": [8], "one": [9], "small": [10], "sample": [11], ".": [12],
+        "The": [13], "study": [14], "did": [15], "not": [16],
+        "establish": [17], "a": [18], "causal": [19], "effect": [20],
+        "and": [21], "further": [22], "research": [23], "is": [24],
+        "needed": [25], "before": [26], "generalizing": [27], "the": [28],
+        "finding": [29], "to": [30], "other": [31], "contexts": [32],
     },
 }
 
@@ -35,16 +35,16 @@ class FakeModel:
         self.calls += 1
         if self.calls == 1:
             return {
-                "phenomenon": "连续加班后，同事似乎更少互相帮忙。",
-                "research_question": "加班时间与工作中的互助行为是否有关？",
-                "search_queries": ["overtime workplace helping behavior"],
+                "phenomenon": "和朋友散步时似乎更容易谈起心事。",
+                "research_question": "散步与谈话中的自我表达是否有关？",
+                "search_queries": ["walking conversational self disclosure"],
             }
         return {
             "verdict": "initial_support",
-            "conclusion": "一项研究提示加班与互助减少有关，但无法证明因果关系。",
-            "claims": [{"text": "加班与较少的互助行为相关。",
+            "conclusion": "一项研究提示散步与更多的自我表达有关，但无法证明因果关系。",
+            "claims": [{"text": "散步与更多的自我表达相关。",
                         "source_ids": ["S99" if self.invented_citation else "S1"]}],
-            "other_explanations": ["工作压力也可能影响互助。"],
+            "other_explanations": ["朋友关系也可能影响谈话深度。"],
             "limitations": ["摘要无法展示研究的全部细节。"],
             "next_step": "阅读全文并核对研究方法。",
         }
@@ -60,16 +60,16 @@ class ResearchTests(unittest.TestCase):
             self.assertIn("api.openalex.org/works", url)
             return {"results": [PAPER, PAPER]}
 
-        papers = search_papers(["overtime workplace helping behavior"], fetcher=fetcher)
+        papers = search_papers(["walking conversational self disclosure"], fetcher=fetcher)
         self.assertEqual(len(papers), 1)
         self.assertEqual(papers[0]["id"], "S1")
         self.assertEqual(papers[0]["url"], "https://doi.org/10.1234/example")
 
     def test_a_plain_sentence_can_produce_a_cited_conditional_answer(self):
         model = FakeModel()
-        paper = search_papers(["overtime workplace helping behavior"],
+        paper = search_papers(["walking conversational self disclosure"],
                               fetcher=lambda url, timeout=25: {"results": [PAPER]})[0]
-        result = analyze("工地连续加班后，大家似乎更不愿意互相帮忙。",
+        result = analyze("我发现和朋友一起散步时，比坐下来聊天更容易谈起心事。",
                          model=model, search=lambda queries: [paper])
         self.assertEqual(model.calls, 2)
         self.assertEqual(result["result"]["verdict"], "initial_support")
@@ -78,9 +78,9 @@ class ResearchTests(unittest.TestCase):
 
     def test_fabricated_reference_cannot_support_a_conclusion(self):
         model = FakeModel(invented_citation=True)
-        paper = search_papers(["overtime workplace helping behavior"],
+        paper = search_papers(["walking conversational self disclosure"],
                               fetcher=lambda url, timeout=25: {"results": [PAPER]})[0]
-        result = analyze("工地连续加班后，大家似乎更不愿意互相帮忙。",
+        result = analyze("我发现和朋友一起散步时，比坐下来聊天更容易谈起心事。",
                          model=model, search=lambda queries: [paper])
         self.assertEqual(result["result"]["verdict"], "insufficient")
         self.assertEqual(result["result"]["claims"], [])

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title description">
+  <title id="title">OneSentenceScience — Everyone can be a scientist</title>
+  <desc id="description">A sentence from daily life grows into a research question and a careful answer. 人人都是科学家。</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#142d32"/>
+      <stop offset="1" stop-color="#254a49"/>
+    </linearGradient>
+    <linearGradient id="orb" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e9efc9"/>
+      <stop offset="1" stop-color="#a7d9a2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="420" rx="24" fill="url(#background)"/>
+  <path d="M0 333 C190 254 342 440 544 334 C698 253 782 316 1200 200" fill="none" stroke="#66937e" stroke-opacity=".27" stroke-width="2"/>
+  <path d="M0 368 C211 289 327 465 580 365 C754 296 857 373 1200 258" fill="none" stroke="#66937e" stroke-opacity=".19" stroke-width="2"/>
+  <text x="64" y="74" fill="#b1ddaf" font-family="Arial, 'Noto Sans SC', 'Microsoft YaHei', sans-serif" font-size="17" font-weight="700" letter-spacing="3">ONE SENTENCE SCIENCE</text>
+  <rect x="64" y="96" width="76" height="4" rx="2" fill="#d8efaa"/>
+  <text x="64" y="165" fill="#f7f7ed" font-family="Arial, 'Noto Sans SC', 'Microsoft YaHei', sans-serif" font-size="51" font-weight="700">Everyone can be</text>
+  <text x="64" y="224" fill="#d6efaf" font-family="Arial, 'Noto Sans SC', 'Microsoft YaHei', sans-serif" font-size="51" font-weight="700">a scientist.</text>
+  <text x="64" y="285" fill="#f7f7ed" font-family="Arial, 'Noto Sans SC', 'Microsoft YaHei', sans-serif" font-size="31" font-weight="600">人人都是科学家</text>
+  <text x="64" y="338" fill="#c9d9d2" font-family="Arial, 'Noto Sans SC', 'Microsoft YaHei', sans-serif" font-size="19">One observation. A question. Evidence. An honest answer.</text>
+  <circle cx="973" cy="210" r="158" fill="none" stroke="#d4e8c3" stroke-opacity=".17" stroke-width="2"/>
+  <circle cx="973" cy="210" r="119" fill="none" stroke="#d4e8c3" stroke-opacity=".3" stroke-width="2"/>
+  <circle cx="973" cy="210" r="80" fill="url(#orb)"/>
+  <text x="973" y="239" fill="#1e4542" font-family="Arial, 'Noto Sans SC', 'Microsoft YaHei', sans-serif" font-size="87" font-weight="700" text-anchor="middle">?</text>
+  <circle cx="859" cy="99" r="11" fill="#d4efaa"/>
+  <circle cx="1109" cy="157" r="8" fill="#c5d8bd"/>
+  <circle cx="900" cy="335" r="7" fill="#c5d8bd"/>
+  <path d="M837 207 h-75 a14 14 0 0 1-14-14 v-27 a14 14 0 0 1 14-14 h80" fill="none" stroke="#a5cdb1" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1048 252 h70 a14 14 0 0 1 14 14 v26 a14 14 0 0 1-14 14 h-64" fill="none" stroke="#a5cdb1" stroke-width="3" stroke-linecap="round"/>
+  <rect x="731" y="131" width="110" height="42" rx="21" fill="#e6f3dd"/>
+  <text x="786" y="158" fill="#254a49" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="middle">observe</text>
+  <rect x="1050" y="286" width="110" height="42" rx="21" fill="#e6f3dd"/>
+  <text x="1105" y="313" fill="#254a49" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="middle">evidence</text>
+</svg>
