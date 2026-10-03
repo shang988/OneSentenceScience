@@ -53,6 +53,37 @@ class LocalHistoryTests(unittest.TestCase):
             with self.assertRaises(StorageError):
                 storage.load("../secrets")
 
+    def test_evidence_excerpt_survives_local_save_and_load(self):
+        with tempfile.TemporaryDirectory() as directory:
+            storage = ChatStorage()
+            storage.directory = Path(directory)
+            report = {
+                "observation": "一起散步时更容易谈心。",
+                "phenomenon": "散步与谈心有关。",
+                "research_question": "散步与自我表达有关吗？",
+                "search_queries": ["walking self disclosure"],
+                "result": {"verdict": "initial_support", "conclusion": "有初步线索。",
+                           "claims": [{"text": "两者有关。", "source_ids": ["S1"],
+                                       "evidence": [{"source_id": "S1",
+                                                     "excerpt": "Walking was associated with greater self-disclosure"}]}],
+                           "other_explanations": [], "limitations": [],
+                           "next_step": "阅读全文。"},
+                "sources": [{"id": "S1", "title": "A study", "year": 2022,
+                             "url": "https://doi.org/10.1234/example",
+                             "openalex_url": "https://openalex.org/W123"}],
+                "method_note": "仅核对摘要摘录。",
+            }
+            chat = {"format": "onesentencescience-chat", "version": 1,
+                    "id": CHAT_ID, "title": "散步时更容易谈心",
+                    "created_at": "2026-09-24T00:00:00Z",
+                    "updated_at": "2026-09-24T00:00:00Z",
+                    "turns": [{"observation": report["observation"],
+                               "created_at": "2026-09-24T00:00:00Z", "report": report}]}
+            storage.save(chat)
+            loaded = storage.load(CHAT_ID)
+            self.assertEqual(loaded["turns"][0]["report"]["result"]["claims"][0]
+                             ["evidence"][0]["source_id"], "S1")
+
 
 if __name__ == "__main__":
     unittest.main()

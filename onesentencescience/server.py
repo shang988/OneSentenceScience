@@ -28,7 +28,7 @@ HISTORY = ChatStorage()
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "OneSentenceScience/0.2"
+    server_version = f"OneSentenceScience/{__version__}"
 
     def _send(self, status: int, content: bytes, content_type: str) -> None:
         self.send_response(status)

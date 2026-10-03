@@ -21,7 +21,7 @@ You do not need to know how to write a paper or use research jargon. Describe so
 
 ![Four steps: observe, ask, find evidence, answer with limits / 四步：观察、提问、找证据、有边界地回答](docs/workflow.svg)
 
-This is a working **v0.1 source-available prototype**. Its answers are preliminary summaries based on retrieved **paper abstracts**. It will not present a personal observation as a new discovery or invent a conclusion where evidence is missing.
+This is a working **v0.1.1 source-available prototype**. Its answers are preliminary summaries based on retrieved **paper abstracts**. It will not present a personal observation as a new discovery or invent a conclusion where evidence is missing.
 
 ### Quick start
 
@@ -59,15 +59,17 @@ python -m onesentencescience
 
 You may also set `OPENALEX_API_KEY` to use your own OpenAlex allowance. Keep keys in local environment variables; do not commit them to GitHub. `.env.example` is only a configuration example: the app does not automatically load `.env`.
 
-### What v0.1 does
+### What v0.1.1 does
 
-The web page has one main observation input plus model and local history controls. The backend turns a sentence into a research question and English search terms, queries OpenAlex, and asks the model to answer using only the abstracts actually retrieved. Every evidence claim must point to a paper from that search; the app discards invented citations. The report keeps the question, search terms, and paper links so people can check them. A follow-up uses up to six earlier turns as conversational context, not as scientific evidence.
+The web page has one main observation input plus model and local history controls. The backend turns a sentence into a research question and English search terms, queries OpenAlex, and asks the model to answer using only the abstracts actually retrieved. Each evidence claim must include a short verbatim excerpt from a retrieved abstract. The program checks that the excerpt appears in the cited abstract and discards claims with missing or invented excerpts or citations. The page shows the search terms, excerpts, and paper links; these fields also survive saving and reopening a chat. Older saved chats remain readable, with a notice when no excerpt was recorded. A follow-up uses up to six earlier turns as conversational context, not as scientific evidence.
+
+The excerpt check confirms text presence only. It does **not** establish that the model interpreted the abstract correctly, that the study is high quality, or that the conclusion is causal. If the model cannot supply a matching excerpt, the program reports insufficient evidence for that answer. Short excerpts are limited to 25 words and 220 characters.
 
 “Initial support” does not establish causation or mean the result applies to everyone. When the search is incomplete, abstracts lack detail, or studies disagree, the answer should say “insufficient evidence” or “mixed findings.”
 
 ### Roadmap
 
-- **v0.1: One sentence → research literature → a qualified answer** (current)
+- **v0.1.1: One sentence → research literature → traceable excerpts → a qualified answer** (current)
 - v0.2: Search public datasets and run basic, reproducible analyses
 - v0.3: Explain ways to test a new hypothesis without assuming research training
 - Later: Support public participation in research with appropriate safeguards
@@ -113,7 +115,7 @@ Earlier commits were published under MIT. The new license applies to this revisi
 
 ![四步流程：观察、提问、找证据、有边界地回答](docs/workflow.svg)
 
-这是一个真正可运行的 **v0.1 源码公开原型**。目前的回答主要依据检索到的**论文摘要**，属于初步证据综合。程序不会把用户的个人观察冒充为新发现，也不会在没有证据时编造结论。
+这是一个真正可运行的 **v0.1.1 源码公开原型**。目前的回答主要依据检索到的**论文摘要**，属于初步证据综合。程序不会把用户的个人观察冒充为新发现，也不会在没有证据时编造结论。
 
 ### 快速开始
 
@@ -153,13 +155,15 @@ python -m onesentencescience
 
 ### 第一个版本能做什么
 
-网页有一个主要的观察输入框，以及模型设置和本地记录入口。输入一句话后，后端会将它转成研究问题和英文检索词，查询 OpenAlex，再让模型只依据实际返回的论文摘要作答。每条证据必须引用本次检索得到的论文；不存在的引用会被程序丢弃。最终报告会保留原始问题、检索词和论文链接，方便人检查。追问最多参考前六轮对话来理解上下文，不会把旧回答当作科学证据。
+网页有一个主要的观察输入框，以及模型设置和本地记录入口。输入一句话后，后端会将它转成研究问题和英文检索词，查询 OpenAlex，再让模型只依据实际返回的论文摘要作答。每条证据需要附上所引论文摘要中连续的短摘录；程序会核对原文是否存在，丢弃编号或摘录不匹配的证据。页面展示检索词、摘要摘录和论文链接；保存聊天后重新打开也能看到。旧版聊天文件仍可打开，没有摘录的证据会显示提示。追问最多参考前六轮对话来理解上下文，不会把旧回答当作科学证据。
+
+摘录核对只能确认原文确实出现过，**不能**证明 AI 对摘要的解读正确、研究质量可靠或结论具有因果性。模型若无法提供匹配的摘录，本次回答会显示证据不足。每条摘录限制为 25 个词、220 个字符以内。
 
 结果中的“有初步支持”不表示因果关系已经被证明，也不表示对每个人都适用。文献检索不完整、摘要信息不足或研究间存在差异时，系统应输出“证据不足”或“结果不一致”。
 
 ### 路线图
 
-- **v0.1：一句话 → 文献证据 → 有边界的回答**（本仓库当前版本）
+- **v0.1.1：一句话 → 文献证据 → 可核对的摘要摘录 → 有边界的回答**（本仓库当前版本）
 - v0.2：公开数据集检索与可复核的基础分析
 - v0.3：针对新假设，生成普通人也能理解的验证方案
 - 后续：在必要的保障下支持公众共同设计和参与研究

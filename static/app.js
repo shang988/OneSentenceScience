@@ -70,6 +70,17 @@ function renderClaims(claims, sources) {
   for (const claim of claims) {
     const card = element('div', 'claim');
     card.append(element('p', 'claim-text', claim.text));
+    const evidence = Array.isArray(claim.evidence) ? claim.evidence : [];
+    let hasExcerpt = false;
+    for (const entry of evidence) {
+      if (!entry || !sourceMap.has(entry.source_id) ||
+          typeof entry.excerpt !== 'string' || !entry.excerpt) continue;
+      const quote = element('blockquote', 'evidence-excerpt', entry.excerpt);
+      quote.prepend(element('span', 'evidence-label', `${entry.source_id} · 摘要摘录`));
+      card.append(quote);
+      hasExcerpt = true;
+    }
+    if (!hasExcerpt) card.append(element('p', 'legacy-evidence-note', '这段记录没有可核对的摘要摘录。'));
     const refs = element('div', 'claim-refs');
     for (const id of claim.source_ids) {
       const source = sourceMap.get(id);
@@ -123,6 +134,11 @@ function renderResult(data) {
   document.querySelector('#research-question').textContent = data.research_question;
   document.querySelector('#conclusion').textContent = data.result.conclusion;
   document.querySelector('#method-note').textContent = data.method_note;
+  const queries = document.querySelector('#search-queries');
+  queries.replaceChildren();
+  for (const query of data.search_queries || []) {
+    queries.append(element('span', 'query-chip', query));
+  }
   const badge = document.querySelector('#verdict-badge');
   badge.textContent = verdictLabels[data.result.verdict] || '证据不足';
   badge.dataset.verdict = data.result.verdict;
@@ -213,6 +229,10 @@ function publicReport(raw) {
       claims: result.claims.slice(0, 3).map(claim => ({
         text: shortString(claim.text, 360),
         source_ids: claim.source_ids.slice(0, 7).map(id => shortString(id, 12)),
+        evidence: (Array.isArray(claim.evidence) ? claim.evidence : []).slice(0, 7)
+          .filter(entry => entry && typeof entry === 'object')
+          .map(entry => ({ source_id: shortString(entry.source_id, 12),
+            excerpt: shortString(entry.excerpt, 220) })),
       })),
       other_explanations: result.other_explanations.slice(0, 3)
         .map(text => shortString(text, 220)),

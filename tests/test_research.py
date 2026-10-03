@@ -30,9 +30,10 @@ PAPER = {
 
 
 class FakeModel:
-    def __init__(self, invented_citation=False):
+    def __init__(self, invented_citation=False, invented_excerpt=False):
         self.calls = 0
         self.invented_citation = invented_citation
+        self.invented_excerpt = invented_excerpt
         self.first_messages = None
 
     def __call__(self, messages, max_tokens=1200):
@@ -48,7 +49,12 @@ class FakeModel:
             "verdict": "initial_support",
             "conclusion": "一项研究提示散步与更多的自我表达有关，但无法证明因果关系。",
             "claims": [{"text": "散步与更多的自我表达相关。",
-                        "source_ids": ["S99" if self.invented_citation else "S1"]}],
+                        "evidence": [{
+                            "source_id": "S99" if self.invented_citation else "S1",
+                            "excerpt": ("Walking definitely causes happiness everywhere"
+                                        if self.invented_excerpt else
+                                        "Walking was associated with greater self-disclosure during conversation"),
+                        }]}],
             "other_explanations": ["朋友关系也可能影响谈话深度。"],
             "limitations": ["摘要无法展示研究的全部细节。"],
             "next_step": "阅读全文并核对研究方法。",
@@ -79,6 +85,8 @@ class ResearchTests(unittest.TestCase):
         self.assertEqual(model.calls, 2)
         self.assertEqual(result["result"]["verdict"], "initial_support")
         self.assertEqual(result["result"]["claims"][0]["source_ids"], ["S1"])
+        self.assertEqual(result["result"]["claims"][0]["evidence"][0]["excerpt"],
+                         "Walking was associated with greater self-disclosure during conversation")
         self.assertNotIn("abstract", result["sources"][0])
 
     def test_fabricated_reference_cannot_support_a_conclusion(self):
@@ -90,6 +98,15 @@ class ResearchTests(unittest.TestCase):
         self.assertEqual(result["result"]["verdict"], "insufficient")
         self.assertEqual(result["result"]["claims"], [])
         self.assertNotIn("一项研究提示", result["result"]["conclusion"])
+
+    def test_real_reference_with_invented_excerpt_cannot_support_conclusion(self):
+        model = FakeModel(invented_excerpt=True)
+        paper = search_papers(["walking conversational self disclosure"],
+                              fetcher=lambda url, timeout=25: {"results": [PAPER]})[0]
+        result = analyze("我发现和朋友一起散步时，比坐下来聊天更容易谈起心事。",
+                         model=model, search=lambda queries: [paper])
+        self.assertEqual(result["result"]["verdict"], "insufficient")
+        self.assertEqual(result["result"]["claims"], [])
 
     def test_short_input_is_rejected_before_external_calls(self):
         with self.assertRaises(ResearchError) as error:

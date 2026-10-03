@@ -65,8 +65,14 @@ def _clean_report(raw: dict) -> dict:
     claims = []
     for item in result.get("claims", [])[:3] if isinstance(result.get("claims"), list) else []:
         if isinstance(item, dict):
+            evidence = []
+            for entry in item.get("evidence", [])[:7] if isinstance(item.get("evidence"), list) else []:
+                if isinstance(entry, dict):
+                    evidence.append({"source_id": _short(entry.get("source_id"), 12),
+                                     "excerpt": _short(entry.get("excerpt"), 220)})
             claims.append({"text": _short(item.get("text"), 360),
-                           "source_ids": _string_list(item.get("source_ids"), 7, 12)})
+                           "source_ids": _string_list(item.get("source_ids"), 7, 12),
+                           "evidence": evidence})
     sources = []
     for item in raw.get("sources", [])[:7] if isinstance(raw.get("sources"), list) else []:
         if isinstance(item, dict):
